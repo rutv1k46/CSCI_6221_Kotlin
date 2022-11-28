@@ -1,5 +1,6 @@
 package com.csci_6221_kotlin.Models
 
+// data class for forecast data model
 data class ForecastModel(
     val cod: Int,
     val message: String,

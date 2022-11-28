@@ -1,5 +1,6 @@
 package com.csci_6221_kotlin.Models
 
+// data class for weather data model
 data class WeatherModel(
     val base: String,
     val clouds: Clouds,

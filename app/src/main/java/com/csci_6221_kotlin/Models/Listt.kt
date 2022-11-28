@@ -1,5 +1,6 @@
 package com.csci_6221_kotlin.Models
 
+// data class for list field forecast data
 data class Listt(
     val dt: Int,
     val main: Main,

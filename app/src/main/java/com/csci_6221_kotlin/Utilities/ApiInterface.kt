@@ -8,6 +8,7 @@ import retrofit2.http.Query
 
 interface ApiInterface {
 
+    // get call for current weather data using latitude and longitude
     @GET("weather")
     fun getCurrentWeatherData(
         @Query("lat") lat:String,
@@ -16,6 +17,7 @@ interface ApiInterface {
         @Query("APPID") appid:String
     ):Call<WeatherModel>
 
+    // get call for current weather data using city name
     @GET("weather")
     fun getCityWeatherData(
         @Query("q") q:String,
@@ -23,6 +25,7 @@ interface ApiInterface {
         @Query("APPID") appid:String
     ):Call<WeatherModel>
 
+    // get call for forecast data using city name
     @GET("forecast")
     fun getCityForecastData(
         @Query("q") q:String,
@@ -30,6 +33,7 @@ interface ApiInterface {
         @Query("APPID") appid:String
     ):Call<ForecastModel>
 
+    // get call for forecast data using latitude and longitude
     @GET("forecast")
     fun getCurrentLocationForecastData(
         @Query("lat") lat:String,

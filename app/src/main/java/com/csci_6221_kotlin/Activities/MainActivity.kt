@@ -38,12 +38,16 @@ import kotlin.math.floor
 import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
+
+    // databinding for classes and methods can observe for changes
     lateinit var binding: ActivityMainBinding
 
+    // location variables
     private lateinit var currentLocation: Location
     private lateinit var fusedLocationProvider: FusedLocationProviderClient
     private val LOCATION_REQUEST_CODE = 101
 
+    // api_key for openweathermap
     private val apiKey="f940abf29513b27fe75bd7c3ac06feac"
 
 
@@ -56,12 +60,15 @@ class MainActivity : AppCompatActivity() {
 
         fusedLocationProvider=LocationServices.getFusedLocationProviderClient(this)
 
+        // get current location
         getCurrentLocation()
 
+        // city search
         binding.citySearch.setOnEditorActionListener { textView, i, keyEvent ->
 
             if (i==EditorInfo.IME_ACTION_SEARCH){
 
+                // get user entered city's current and forecast data
                 getCityWeather(binding.citySearch.text.toString())
                 getCityForecastWeather(binding.citySearch.text.toString())
 
@@ -89,7 +96,7 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-
+        // listener for current location
         binding.currentLocation.setOnClickListener {
 
             getCurrentLocation()
@@ -100,10 +107,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // get user searched city's weather data
     private fun getCityWeather(city: String) {
 
+        // set progress bar
         binding.progressBar.visibility= View.VISIBLE
 
+        // api call for current data using the city name
         ApiUtilities.getApiInterface()?.getCityWeatherData(city,"metric", apiKey)
             ?.enqueue(object :Callback<WeatherModel>{
                 @RequiresApi(Build.VERSION_CODES.O)
@@ -112,6 +122,7 @@ class MainActivity : AppCompatActivity() {
 
                         binding.progressBar.visibility= View.GONE
 
+                        // set data once received
                         response.body()?.let {
                             setData(it)
                         }
@@ -119,6 +130,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     else{
 
+                        // if city not found
                         Toast.makeText(this@MainActivity, "No City Found",
                             Toast.LENGTH_SHORT).show()
 
@@ -140,8 +152,10 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    // get current location's weather data
     private fun fetchCurrentLocationWeather(latitude: String, longitude: String) {
 
+        // api call for current data using latitude and longitude
         ApiUtilities.getApiInterface()?.getCurrentWeatherData(latitude,longitude,"metric",apiKey)
             ?.enqueue(object :Callback<WeatherModel>{
                 @RequiresApi(Build.VERSION_CODES.O)
@@ -151,6 +165,7 @@ class MainActivity : AppCompatActivity() {
 
                         binding.progressBar.visibility= View.GONE
 
+                        // set data once received
                         response.body()?.let {
                             setData(it)
                         }
@@ -170,8 +185,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // get user searched city's forecast data
     private fun getCityForecastWeather(city: String) {
 
+        // api call for forecast data using the city name
         ApiUtilities.getApiInterface()?.getCityForecastData(city,"metric",apiKey)
             ?.enqueue(object :Callback<ForecastModel>{
                 @RequiresApi(Build.VERSION_CODES.O)
@@ -181,6 +198,7 @@ class MainActivity : AppCompatActivity() {
 
                         binding.progressBar.visibility= View.GONE
 
+                        // set data once received
                         response.body()?.let {
                             setForecastData(it)
                         }
@@ -201,8 +219,10 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    // get forecast data for current location
     private fun fetchCurrentLocationForecast(latitude: String, longitude: String) {
 
+        // api call for current data using latitude and longitude
         ApiUtilities.getApiInterface()?.getCurrentLocationForecastData(latitude, longitude, "metric",apiKey)
             ?.enqueue(object :Callback<ForecastModel>{
                 @RequiresApi(Build.VERSION_CODES.O)
@@ -212,6 +232,7 @@ class MainActivity : AppCompatActivity() {
 
                         binding.progressBar.visibility= View.GONE
 
+                        // set data once received
                         response.body()?.let {
                             setForecastData(it)
                         }
@@ -232,10 +253,13 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    // get current location of the device
     private fun getCurrentLocation(){
 
+        // check permissions
         if (checkPermissions()){
 
+            // check if location is enabled
             if (isLocationEnabled()){
 
                 if (ActivityCompat.checkSelfPermission(
@@ -258,11 +282,13 @@ class MainActivity : AppCompatActivity() {
 
                             binding.progressBar.visibility = View.VISIBLE
 
+                            // get current weather data for device's current location
                             fetchCurrentLocationWeather(
                                 location.latitude.toString(),
                                 location.longitude.toString()
                             )
 
+                            // get forecast data for device's current location
                             fetchCurrentLocationForecast(
                                 location.latitude.toString(),
                                 location.longitude.toString()
@@ -276,6 +302,7 @@ class MainActivity : AppCompatActivity() {
 
                 val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
 
+                // request permissions from the user
                 startActivity(intent)
 
 
@@ -285,6 +312,7 @@ class MainActivity : AppCompatActivity() {
         }
         else{
 
+            // request permissions from the user
             requestPermission()
 
         }
@@ -292,6 +320,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // request permissions
     private fun requestPermission() {
 
         ActivityCompat.requestPermissions(
@@ -304,6 +333,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // check if location enabled
     private fun isLocationEnabled(): Boolean {
 
         val locationManager:LocationManager=getSystemService(Context.LOCATION_SERVICE)
@@ -317,6 +347,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // check if permission granted
     private fun checkPermissions(): Boolean {
 
         if (ActivityCompat.checkSelfPermission(this,
@@ -363,6 +394,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    // set current weather data on the ui
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setData(body:WeatherModel){
 
@@ -405,6 +437,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // set forecast data on the ui
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setForecastData(body:ForecastModel){
 
@@ -432,6 +465,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // convert time from UTC to device's local time
     @RequiresApi(Build.VERSION_CODES.O)
     private fun ts2td(ts:Long):String{
 
@@ -449,6 +483,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    // update current weather ui components
     private fun updateUI(id: Int) {
 
         binding.apply {
@@ -569,6 +604,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // update forecast ui components
     private fun updateForecastUI(id: Int, nextDayImg: ImageView) {
 
         binding.apply {

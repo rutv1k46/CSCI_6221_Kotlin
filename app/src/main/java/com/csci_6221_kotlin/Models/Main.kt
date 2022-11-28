@@ -1,5 +1,6 @@
 package com.csci_6221_kotlin.Models
 
+// data class for main field
 data class Main(
     val feels_like: Double,
     val grnd_level: Int,
